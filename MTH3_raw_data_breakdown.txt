@@ -1,0 +1,15 @@
+C:\vr\vroutput\MTH3_vr[x]_[date_hour].csv
+
+Row structure in file:
+
+[time (first value is NOT 0)]; 
+[position (cm)]; 
+[time passed since last frame was displayed]; 
+[velocity]; 
+[currentWorld]; 
+[valve status (0 closed, 1 open and triggered, 2 open and not triggered)]; 
+[trial counter]; 
+[licknum (0 no lick, 1 lick)]; 
+[wheel velocity]
+
+sep = ';'
