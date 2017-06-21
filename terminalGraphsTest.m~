@@ -1,8 +1,5 @@
 %UNCOMMENT NEXT LINE AFTER TESTS ARE DONE 
 %sessionData = getLatestFile('C:\vr\vroutput\*.csv'); 
-
- 
-
 sessionData = ('MTH3_vr1_2017615_1731.csv'); 
 %filePath = fullfile('C:', 'vr', 'vroutput', sessionData); 
 filePath = fullfile('Users', 'Raul', 'coding', 'mit', 'harnett', 'msrp-matlab', sessionData)
@@ -23,17 +20,16 @@ numTrials = [data{7}];
 numLicks = [data{8}]; 
 wheelVel = [data{9}];
 
-S = vrWorld == 3;
-L = vrWorld == 4;
+L = vrWorld == 3;
+M = vrWorld == 4;
+posShort = pos(L);
+posLong = pos(M);
 
-posShort = pos(S);
-posLong = pos(L);
+numTrialsShort = numTrials(L);
+numTrialsLong = numTrials(M);
 
-numTrialsShort = numTrials(S);
-numTrialsLong = numTrials(L);
-
-numLicksShort = numLicks(S);
-numLicksLong = numLicks(L);
+numLicksShort = numLicks(L);
+numLicksLong = numLicks(M);
  
 licksShort = find(numLicksShort);      % indexes of licks 
 licksLong = find(numLicksLong);
