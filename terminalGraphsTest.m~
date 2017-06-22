@@ -46,6 +46,30 @@ licksLong = find(numLicksLong);
 totalShortTrials = length(unique(numTrialsShort)); 
 totalLongTrials = length(unique(numTrialsLong)); 
 
+% % Calculate total distance in short trials
+% tempS = zeros(length(numLicksShort),1);
+% for t = 1:length(tempS)-1
+%     if numTrials(t + 1) ~= numTrials(t)
+%         tempS(t) = 1;
+%     end
+% end 
+% 
+% shortDistTemp = find(tempS .* posShort); % Indices of distance travelled on each short trial
+% distShort = pos(shortDistTemp);         % Returns distance travelled
+% totDistShort = sum(distShort);
+% 
+% % Calculate total distance in long trials
+% tempL = zeros(length(posLong),1);
+% for t = 1:length(tempL)-1
+%     if numTrials(t + 1) ~= numTrials(t)
+%         tempL(t) = 1;
+%     end
+% end
+% 
+% longDistTemp = find(tempL .* posLong); % Indices of distance travelled on each long trial
+% distLong = pos(longDistTemp);         % Returns distance travelled
+% totDistLong = sum(distLong);
+
 % Kudos to Quique, who helped me figure out for loops in MATLAB
 
 % Separate arrays for triggered vs. automatic reward
@@ -58,8 +82,8 @@ end
 
 triggeredTemp = find(tempT);    % Indexes of triggered rewards
 triggered = numLicks(tempT ~= 0);
-triggeredShort = intersect(licksShort, triggeredTemp);
-triggeredLong = intersect(licksLong, triggeredTemp);
+triggeredShort = union(licksShort, triggeredTemp);
+triggeredLong = union(licksLong, 
 
 tempA = zeros(length(numLicks),1);
 for t = 1:length(tempA)-1
@@ -70,8 +94,6 @@ end
 
 autoTemp = find(tempA);         % Indexes of automatic rewards
 auto = numLicks(tempA ~= 0);
-autoShort = intersect(licksShort, autoTemp);
-autoLong = intersect(licksLong, autoTemp);
 
 % Average velocity of mouse
 tempV = zeros(length(vel),1);
@@ -83,7 +105,7 @@ for t = 1:length(vel)-1
 end
 
 vels = tempV(tempV ~= 0);   % Holds velocities over thresholds
-avgVel = sum(vels)/length(vels);
+avgVel = sum(vels)/length(totVel);
 
 % Figure setup, from this point on
 figure
