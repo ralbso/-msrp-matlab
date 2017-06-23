@@ -48,29 +48,21 @@ wheel_vel = [data{9}];          % Wheel velocity
 % Create matrix from individual cell arrays (for easier handling)
 all_data = [t pos t_frame vel vr_world valve_stat num_trials licks wheel_vel];
 
-% Logicals. S for short, L for long.
-S = vr_world == 3; 
-L = vr_world == 4;
+% Data on short tracks
+pos_short = pos(vr_world == 3, :);                     % Location
+num_trials_short = num_trials(vr_world == 3, :);       % Trial #
+licks_short = find(licks(vr_world == 3));              % Indices of licks
+total_short_trials = length(unique(num_trials_short)); % Total trials
 
-% Mouse position for each trial
-pos_short = pos(S);
-pos_long = pos(L);
+% Data on long tracks
+pos_long = pos(vr_world == 4, :);                       % Location
+num_trials_long = num_trials(vr_world == 4, :);         % Trial #
+licks_long = find(licks(vr_world == 4));                % Indices of licks
+total_long_trials = length(unique(num_trials_long));    % Total trials
 
-% Trial # for each type of trial
-num_trials_short = num_trials(S);
-num_trials_long = num_trials(L);
-
-% Licks on each trial
-licksS = licks(S);
-licksL = licks(L);
-
-% Indexes of licks on each trial 
-licksS = find(licksS); 
-licksL = find(licksL); 
-
-% Total trials
-total_short_trials = length(unique(num_trials_short)); 
-total_long_trials = length(unique(num_trials_long)); 
+% Slice data by track length
+short_data = all_data(vr_world == 3, :);
+long_data = all_data(vr_world == 4, :);
 
 % Honorable mention to Quique, who helped me refresh for loops in MATLAB
 
@@ -111,7 +103,7 @@ figure
     
     % Short trials
     subplot(6,5,[2 28])
-    plot(pos_short(licksS), num_trials_short(licksS), 'bo') 
+    plot(pos_short(licks_short), num_trials_short(licks_short), 'bo') 
     
     xlabel('Location (cm)') 
     xlim([50 350])
@@ -130,7 +122,7 @@ figure
     
     % Long trials
     subplot(6,5,[4 30])
-    plot(pos_long(licksS), num_trials_long(licksS), 'ro')
+    plot(pos_long(licks_long), num_trials_long(licks_long), 'ro')
     
     xlabel('Location (cm)')
     xlim([50 420])
