@@ -119,18 +119,18 @@ figure
     subplot(6,5,[2 28])
     plot(pos_licks_short, trial_licks_short, 'bo') 
     
-    xlabel('Location (cm)') 
+    xlabel('Location (cm)')
     xlim([50 350])
     ylabel('Trial #') 
     title('Short trials') 
     
     % Adds reference lines for landmark
     vline([200 240], {'k', 'k'})
-    annotation('rectangle',[.436 .109 .039 .817],'FaceColor','black','FaceAlpha',.1)
+    annotation('rectangle',[.436 .1095 .039 .8164],'FaceColor','black','FaceAlpha',.1)
     
     % Adds reference lines for reward zone
     vline([320 340], {'k', 'k'})
-    annotation('rectangle', [.551 .109 .019 .817],'FaceColor', 'blue','FaceAlpha',.1)
+    annotation('rectangle', [.551 .1095 .019 .8164],'FaceColor', 'blue','FaceAlpha',.1)
     hold on;
     
     plot(pos_triggered_short, trial_triggered_short, 'g*')
@@ -149,11 +149,11 @@ figure
     
     % Adds reference lines for landmark
     vline([200 240], {'k', 'k'})
-    annotation('rectangle',[.734 .109 .0325 .817],'FaceColor','black','FaceAlpha',.1)
+    annotation('rectangle',[.734 .1095 .0325 .8164],'FaceColor','black','FaceAlpha',.1)
     
     % Adds reference lines for reward zone box
     vline([380 400], {'k', 'k'})
-    annotation('rectangle', [.874 .109 .016 .817],'FaceColor','blue','FaceAlpha',.1)
+    annotation('rectangle', [.874 .1095 .016 .8164],'FaceColor','magenta','FaceAlpha',.1)
     hold on;
     
     plot(pos_triggered_long, trial_triggered_long, 'g*')
