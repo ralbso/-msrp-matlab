@@ -5,7 +5,7 @@ function performance(bin)
 %   Returns session performance overview.
 %   See also GETLATESTFILE, VLINE.
 
-% Select latest .csv in directory
+% Automatic selection of most recent .csv file in directory
 if bin == 0
     file_name = getLatestFile('C:\vr\vroutput\*.csv'); 
     path = 'C:\vr\vroutput\';
@@ -20,7 +20,7 @@ if bin == 1
 end
 
 % Arg can only be 0 or 1
-if bin > 1
+if bin > 1 || bin < 0
     error('Arg can only be 0 or 1.')
 end
 
@@ -45,23 +45,23 @@ wheel_vel = [data{9}];          % Wheel velocity
 all_data = [t pos t_frame vel vr_world valve_stat num_trials licks wheel_vel];
 
 % Data on short tracks
-short = vr_world == 3;
+short = vr_world == 3;                         % Short track is track 3
 pos_short = pos(short, :);                     % Location
 num_trials_short = num_trials(short, :);       % Trial #
 licks_short = find(licks(short));              % Indices of licks
 total_short_trials = length(unique(num_trials_short)); % Total trials
 
 % Data on long tracks
-long = vr_world == 4;
+long = vr_world == 4;                          % Long track is track 4
 pos_long = pos(long, :);                       % Location
 num_trials_long = num_trials(long, :);         % Trial #
 licks_long = find(licks(long));                % Indices of licks
 total_long_trials = length(unique(num_trials_long));    % Total trials
 
 % Valve status
-valve_change = diff(valve_stat);
+valve_change = diff(valve_stat);               % Only valve changes matter to us
 
-temp_trig = zeros(length(valve_change),1);
+temp_trig = zeros(length(valve_change),1);     % Convert into logical
 for t = 1:length(valve_change)
     if valve_change(t) == 1
         temp_trig(t) = valve_change(t);
@@ -69,7 +69,7 @@ for t = 1:length(valve_change)
 end
 
 temp_def = zeros(length(valve_change),1);
-for t = 1:length(valve_change);
+for t = 1:length(valve_change)                 % Convert into logical
     if valve_change(t) == 2
         temp_def(t-1) = 1;
     end
@@ -86,27 +86,30 @@ default_long_ind = find(temp_def(long));
 % Honorable mention to Quique, who helped me refresh for loops in MATLAB
 % Average velocity of mouse
 tempV = zeros(length(vel),1);
-thresh = 0.7;
+thresh = 0.7;               % Slower speed is considered stationary
 for t = 1:length(vel)-1
     if vel(t) > thresh
-        tempV(t) = vel(t);  % Velocities under thresh will be 0
+        tempV(t) = vel(t);  % Velocities under thresh will remain as 0
     end
 end
 
 vels = tempV(tempV ~= 0);   % Holds velocities over thresholds
 avg_vel = sum(vels)/length(vels);
 
-% For plotting
+% For plotting:
+% Licks along the tracks
 pos_licks_short = pos_short(licks_short);
 trial_licks_short = num_trials_short(licks_short);
 pos_licks_long = pos_long(licks_long);
 trial_licks_long = num_trials_long(licks_long);
 
+% Triggered rewards
 pos_triggered_short = pos_short(trig_short_ind);
 trial_triggered_short = num_trials_short(trig_short_ind);
 pos_triggered_long = pos_long(trig_long_ind);
 trial_triggered_long = num_trials_long(trig_long_ind);
 
+% Default rewards
 pos_short_def = pos_short(default_short_ind);
 trial_short_def = num_trials_short(default_short_ind);
 pos_long_def = pos_long(default_long_ind);
