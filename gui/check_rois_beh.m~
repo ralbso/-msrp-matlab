@@ -1,35 +1,35 @@
-function varargout = check_rois(varargin)
-% CHECK_ROIS MATLAB code for check_rois.fig
-%      CHECK_ROIS, by itself, creates a new CHECK_ROIS or raises the existing
+function varargout = check_rois_beh(varargin)
+% CHECK_ROIS_BEH MATLAB code for check_rois_beh.fig
+%      CHECK_ROIS_BEH, by itself, creates a new CHECK_ROIS_BEH or raises the existing
 %      singleton*.
 %
-%      H = CHECK_ROIS returns the handle to a new CHECK_ROIS or the handle to
+%      H = CHECK_ROIS_BEH returns the handle to a new CHECK_ROIS_BEH or the handle to
 %      the existing singleton*.
 %
-%      CHECK_ROIS('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in CHECK_ROIS.M with the given input arguments.
+%      CHECK_ROIS_BEH('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in CHECK_ROIS_BEH.M with the given input arguments.
 %
-%      CHECK_ROIS('Property','Value',...) creates a new CHECK_ROIS or raises the
+%      CHECK_ROIS_BEH('Property','Value',...) creates a new CHECK_ROIS_BEH or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before check_rois_OpeningFcn gets called.  An
+%      applied to the GUI before check_rois_beh_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to check_rois_OpeningFcn via varargin.
+%      stop.  All inputs are passed to check_rois_beh_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help check_rois
+% Edit the above text to modify the response to help check_rois_beh
 
-% Last Modified by GUIDE v2.5 13-Jul-2017 11:17:39
+% Last Modified by GUIDE v2.5 13-Jul-2017 13:19:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @check_rois_OpeningFcn, ...
-                   'gui_OutputFcn',  @check_rois_OutputFcn, ...
+                   'gui_OpeningFcn', @check_rois_beh_OpeningFcn, ...
+                   'gui_OutputFcn',  @check_rois_beh_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,26 +44,26 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before check_rois is made visible.
-function check_rois_OpeningFcn(hObject, ~, handles, varargin)
+% --- Executes just before check_rois_beh is made visible.
+function check_rois_beh_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to check_rois (see VARARGIN)
+% varargin   command line arguments to check_rois_beh (see VARARGIN)
 
-% Choose default command line output for check_rois
+% Choose default command line output for check_rois_beh
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes check_rois wait for user response (see UIRESUME)
-% uiwait(handles.check_rois);
+% UIWAIT makes check_rois_beh wait for user response (see UIRESUME)
+% uiwait(handles.check_rois_beh);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = check_rois_OutputFcn(hObject, ~, handles) 
+function varargout = check_rois_beh_OutputFcn(hObject, ~, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -79,6 +79,7 @@ function load_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% IMAGING DATA
 % get file name and its path
 try
     % if running on any mac with lab's external hard drive
@@ -97,7 +98,7 @@ catch
     error('There was a problem retrieving your file.')
 end
 
-assert(~isequal(handles.file_name,0), 'File selection cancelled.')
+assert(~isequal(handles.file_name,0), 'Imaging file selection cancelled.')
 
 [~, name, ~] = fileparts(handles.file_name);
 
@@ -165,6 +166,25 @@ colormap(gray)
 
 % print current roi on top of graph
 set(handles.roi_num, 'String', strcat("ROI ", num2str(handles.col)));
+
+% BEHAVIORAL DATA
+% get behavioral data file and its path
+try
+    if ismac
+        [handles.beh,path_beh] = uigetfile('MTH3_vr1_*.csv', 'Select behavioral data',...
+            '/Volumes/LaCie');
+    end
+    if ispc
+        [handles.beh, path_beh] = uigetfile('MTH3_vr1_*.csv', 'Select behavioral data',...
+            'F:\');
+    end
+catch
+    error('There was a problem retrieving your file.')
+end
+
+assert(~isqueal(handles.beh,0), 'Behavioral file selection cancelled.')
+
+file_path = fullfile(pathbeh, handles.)
 
 guidata(hObject, handles)
 
