@@ -5,6 +5,7 @@ function performance(bin)
 %   Returns session performance overview.
 %   See also GETLATESTFILE, VLINE.
 
+%% File selection
 % Automatic selection of most recent .csv file in directory
 if bin == 0
     file_name = getLatestFile('C:\vr\vroutput\*.csv'); 
@@ -26,7 +27,7 @@ end
 
 file_path = fullfile(path, file_name); 
 
-% read .csv with session data 
+%% Load .csv with session data
 data = dlmread(file_path);
 
 t = data(:,1);                  % Time
@@ -39,21 +40,21 @@ num_trials = data(:,7);         % Number of trials
 licks = data(:,8);              % Number of licks
 wheel_vel = data(:,9);          % Wheel velocity
 
-% Data on short tracks
+%% Data on short tracks
 short = vr_world == 3;                         % Short track is track 3
-pos_short = pos(short, :);                     % Location
-num_trials_short = num_trials(short, :);       % Trial #
+pos_short = pos(short,:);                      % Location
+num_trials_short = num_trials(short,:);        % Trial #
 licks_short = find(licks(short));              % Indices of licks
 total_short_trials = length(unique(num_trials_short)); % Total trials
 
-% Data on long tracks
+%% Data on long tracks
 long = vr_world == 4;                          % Long track is track 4
-pos_long = pos(long, :);                       % Location
-num_trials_long = num_trials(long, :);         % Trial #
+pos_long = pos(long,:);                        % Location
+num_trials_long = num_trials(long,:);          % Trial #
 licks_long = find(licks(long));                % Indices of licks
-total_long_trials = length(unique(num_trials_long));    % Total trials
+total_long_trials = length(unique(num_trials_long));   % Total trials
 
-% Valve status
+%% Valve status
 valve_change = diff(valve_stat);               % Only valve changes matter to us
 
 temp_trig = zeros(length(valve_change),1);     % Convert into logical
@@ -79,7 +80,7 @@ default_short_ind = find(temp_def(short));
 default_long_ind = find(temp_def(long));
 
 % Honorable mention to Quique, who helped me refresh for loops in MATLAB
-% Average velocity of mouse
+%% Average velocity of mouse
 tempV = zeros(length(vel),1);
 thresh = 0.7;               % Slower speed is considered stationary
 for t = 1:length(vel)-1
@@ -91,7 +92,7 @@ end
 vels = tempV(tempV ~= 0);   % Holds velocities over thresholds
 avg_vel = sum(vels)/length(vels);
 
-% For plotting:
+%% For plotting
 % Licks along the tracks
 pos_licks_short = pos_short(licks_short);
 trial_licks_short = num_trials_short(licks_short);
@@ -110,28 +111,52 @@ trial_short_def = num_trials_short(default_short_ind);
 pos_long_def = pos_long(default_long_ind);
 trial_long_def = num_trials_long(default_long_ind);
 
-% First licks
-% first_licks = find(diff(numLicks));
+% set ylim value to change depending on the amount of trials
+y = ((total_long_trials + total_short_trials)*2);
+total_trials = (total_long_trials + total_short_trials);
 
-% Figure setup, from this point on
+%% First licks
+
+pos_trial_mat_short = [pos_licks_short(pos_licks_short>=200) trial_licks_short(pos_licks_short>=200)];
+[~,is,~] = unique(trial_licks_short(pos_licks_short>=200));
+first_licks_short = pos_trial_mat_short(is,:);
+
+pos_trial_mat_long = [pos_licks_long(pos_licks_long>=200) trial_licks_long(pos_licks_long>=200)];
+[~,il,~] = unique(trial_licks_long(pos_licks_long>=200));
+first_licks_long = pos_trial_mat_long(il,:);
+
+if max(first_licks_short(:,1)) ~= 0
+    avg_first_lick_short = mean(first_licks_short(:,1));
+else
+    avg_first_lick_short = 'No licks';
+end
+
+if max(first_licks_long(:,1)) ~= 0
+    avg_first_lick_long = mean(first_licks_long(:,1));
+else
+    avg_first_lick_long = 'No licks';
+end
+
+%% Figure setup
 figure
     
     % Short trials
-    subplot(6,5,[2 28])
+    subplot(10,5,[2 28])
     plot(pos_licks_short, trial_licks_short, 'bo') 
     
     xlabel('Location (cm)')
-    xlim([50 350])
+    xlim([50 360])
+    ylim([0 y])
     ylabel('Trial #') 
     title('Short trials') 
     
     % Adds reference lines for landmark
     vline([200 240], {'k', 'k'})
-    annotation('rectangle',[.436 .1095 .039 .8164],'FaceColor','black','FaceAlpha',.1)
+    annotation('rectangle',[.432 .445 .036 .48],'FaceColor','black','FaceAlpha',.1)
     
     % Adds reference lines for reward zone
     vline([320 340], {'k', 'k'})
-    annotation('rectangle', [.551 .1095 .019 .8164],'FaceColor', 'blue','FaceAlpha',.1)
+    annotation('rectangle', [.542 .445 .019 .48],'FaceColor', 'blue','FaceAlpha',.1)
     hold on;
     
     plot(pos_triggered_short, trial_triggered_short, 'g*')
@@ -141,20 +166,21 @@ figure
     hold on;
     
     % Long trials
-    subplot(6,5,[4 30])
+    subplot(10,5,[4 30])
     plot(pos_licks_long, trial_licks_long, 'bo')
     
     xlabel('Location (cm)')
     xlim([50 420])
+    ylim([0 y])
     title('Long trials')
     
     % Adds reference lines for landmark
     vline([200 240], {'k', 'k'})
-    annotation('rectangle',[.734 .1095 .0325 .8164],'FaceColor','black','FaceAlpha',.1)
+    annotation('rectangle',[.734 .445 .0325 .48],'FaceColor','black','FaceAlpha',.1)
     
     % Adds reference lines for reward zone box
     vline([380 400], {'k', 'k'})
-    annotation('rectangle', [.874 .1095 .016 .8164],'FaceColor','magenta','FaceAlpha',.1)
+    annotation('rectangle', [.874 .445 .016 .48],'FaceColor','magenta','FaceAlpha',.1)
     hold on;
     
     plot(pos_triggered_long, trial_triggered_long, 'g*')
@@ -163,28 +189,62 @@ figure
     plot(pos_long_def, trial_long_def, 'r*')
     hold on;
     
+    % First licks
+    subplot(10,5,[37 50])
+    plot(first_licks_short(:,1), first_licks_short(:,2), 'bo');
+    hold on;
+    plot(first_licks_long(:,1), first_licks_long(:,2), 'ro');
+    hold on;
+    
+    legend('Short track', 'Long track')
+    xlabel('Location (cm)')
+    xlim([190 420])
+    ylim([0 y])
+    title('First licks')
+    
+    vline([200 240], {'k', 'k'})
+    annotation('rectangle', [.32 .11 .1052 .227], 'FaceColor','black','FaceAlpha',.1)
+    hold on;
+    
+    vline([320 340], {'k', 'k'})
+    annotation('rectangle', [.6393 .11 .0522 .227], 'FaceColor','blue','FaceAlpha',.1)
+    hold on;
+    
+    vline([380 400], {'k', 'k'})
+    annotation('rectangle', [.799 .11 .0522 .227], 'FaceColor','magenta','FaceAlpha',.1)
+    hold on;
+    
     % Adds textbox for session information
-    axes('Position', [0.01 0 1 1], 'Visible', 'off');
-    descr = {'Short trials:';
-        strcat(num2str(total_short_trials), ' trials');
+    axes('Position', [0.02 0.07 1 1], 'Visible', 'off');
+    descr = {'Total trials: ' 
+        num2str(total_trials);
         '';
-        'Long trials:';
-        strcat(num2str(total_long_trials), ' trials');
+        'Short trials:';
+        num2str(total_short_trials);
+        '';
+        'Long trials:' 
+        num2str(total_long_trials);
         '';
         'Average velocity:';
-        strcat(num2str(avg_vel), ' cm/s')};
-    text(0.025,0.5,descr)
+        [num2str(round(avg_vel,2)), ' cm/s'];
+        '';
+        'Mean first lick (short trials):';
+        strcat(num2str(round(avg_first_lick_short,2)), ' cm');
+        ''
+        'Mean first lick (long trials):'
+        strcat(num2str(round(avg_first_lick_long,2)), ' cm')};
+    text(0.025,0.4,descr)
     
     % Figure parameters
     x0 = 350;       % x position on screen
     y0 = 200;       % y Position on screen
     width = 900;    
-    height = 500;   
+    height = 600;   
     set(gcf, 'units','points','position',[x0,y0,width,height])
 
+%% Save figure
 file_name = strrep(file_name, '.csv', '');
 save_session = [file_name '.png'];
 saveas(gcf, save_session);
 
-%fclose(raw_data); 
 end

@@ -22,7 +22,7 @@ function varargout = check_rois_beh(varargin)
 
 % Edit the above text to modify the response to help check_rois_beh
 
-% Last Modified by GUIDE v2.5 13-Jul-2017 13:19:06
+% Last Modified by GUIDE v2.5 17-Jul-2017 16:08:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,8 +79,7 @@ function load_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% IMAGING DATA
-% get file name and its path
+% get imaging file name and path
 try
     % if running on any mac with lab's external hard drive
     if ismac
@@ -100,6 +99,26 @@ end
 
 assert(~isequal(handles.file_name,0), 'Imaging file selection cancelled.')
 
+% get behavioral data name and path
+try
+    if ismac
+        [handles.beh,path_beh] = uigetfile('MTH3_vr1_*.csv', 'Select behavioral data',...
+            '/Volumes/LaCie');
+    end
+    if ispc
+        [handles.beh, path_beh] = uigetfile('MTH3_vr1_*.csv', 'Select behavioral data',...
+            'F:\');
+    end
+catch
+    error('There was a problem retrieving your file.')
+end
+
+assert(~isequal(handles.beh,0), 'Behavioral file selection cancelled.')
+
+file_path = fullfile(path_beh, handles.beh);
+data = dlmread(file_path);
+
+% IMAGING DATA
 [~, name, ~] = fileparts(handles.file_name);
 
 handles.file_name = [pathstr name];
@@ -132,7 +151,7 @@ visual = sbxmakeref(sbx, 300, 1);
 handles.mean_vis = mean(visual,3);
 
 % contains roi mask; see imagesc(handles.mask)
-mask_file = load('/Volumes/LaCie/20170612/M01/M01_000_004_rigid.segment', '-mat');
+mask_file = load([handles.file_name '.segment'], '-mat');
 
 % mask_file contains the structure mask
 % for easier (and global) access, we set this mask to a handle
@@ -168,28 +187,25 @@ colormap(gray)
 set(handles.roi_num, 'String', strcat("ROI ", num2str(handles.col)));
 
 % BEHAVIORAL DATA
-% get behavioral data file and its path
-try
-    if ismac
-        [handles.beh,path_beh] = uigetfile('MTH3_vr1_*.csv', 'Select behavioral data',...
-            '/Volumes/LaCie');
+% set up time and position
+t = data(:,1);
+pos = data(:,2);
+vr_world = data(:,5);   % keep track of blackboxes
+
+corridor = logical(vr_world ~= 5);
+
+for i = 1:length(corridor)
+    if corridor(i) == 0
+        pos(i) = 0;
     end
-    if ispc
-        [handles.beh, path_beh] = uigetfile('MTH3_vr1_*.csv', 'Select behavioral data',...
-            'F:\');
-    end
-catch
-    error('There was a problem retrieving your file.')
 end
 
-assert(~isequal(handles.beh,0), 'Behavioral file selection cancelled.')
+ax(handles.beh_plot);
+plot(handles.beh_plot, t, pos);
+xlim([0 900]);
 
-file_path = fullfile(path_beh, handles.beh);
-
-data = dlmread(file_path);
-
-
-
+% 30 FRAMES PER SECOND
+% DIVIDE FLUORESCENCE BY 30 TO GET THE TIME
 
 guidata(hObject, handles)
 
@@ -255,6 +271,8 @@ handles.col = handles.col - 1;
 % to evade error messages, reset to 1 if user tries to go below 0
 if handles.col <= 0
     handles.col = 1;
+    disp('There are no more ROIs to display')
+    
 end
 
 % clear roi_plot axes for new plot
@@ -467,3 +485,29 @@ handles.roi_vis = hObject;
 set(handles.roi_vis,'YTick',[])
 set(handles.roi_vis,'XTick',[])
 guidata(hObject, handles)
+
+
+function date_Callback(hObject, eventdata, handles)
+% hObject    handle to date (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of date as text
+%        str2double(get(hObject,'String')) returns contents of date as a double
+
+handles.date = get(hObject,'String');
+
+guidata(hObject, handles)
+
+
+% --- Executes during object creation, after setting all properties.
+function date_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to date (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
